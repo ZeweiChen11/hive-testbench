@@ -1,5 +1,5 @@
-drop view revenue_cached;
-drop view max_revenue_cached;
+drop view if exists revenue_cached;
+drop view if exists max_revenue_cached;
 
 create view revenue_cached as
 select
@@ -32,3 +32,4 @@ where
 	s_suppkey = supplier_no
 	and total_revenue = max_revenue 
 order by s_suppkey;
+

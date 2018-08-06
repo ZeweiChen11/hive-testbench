@@ -1,5 +1,5 @@
-drop view q18_tmp_cached;
-drop table q18_large_volume_customer_cached;
+drop view if exists q18_tmp_cached;
+drop table if exists q18_large_volume_customer_cached;
 
 create view q18_tmp_cached as
 select
@@ -42,3 +42,4 @@ order by
 	o_totalprice desc,
 	o_orderdate 
 limit 100;
+

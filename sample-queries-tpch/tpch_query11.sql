@@ -1,5 +1,5 @@
-drop view q11_part_tmp_cached;
-drop view q11_sum_tmp_cached;
+drop view if exists q11_part_tmp_cached;
+drop view if exists q11_sum_tmp_cached;
 
 create view q11_part_tmp_cached as
 select
@@ -35,3 +35,4 @@ where
 	part_value > total_value * 0.0001
 order by
 	value desc;
+
