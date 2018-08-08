@@ -1,28 +1,29 @@
 drop table if exists ${var:DB}.lineitem;
 create external table ${var:DB}.lineitem 
-(L_ORDERKEY BIGINT,
- L_PARTKEY BIGINT,
- L_SUPPKEY BIGINT,
- L_LINENUMBER INT,
- L_QUANTITY DOUBLE,
- L_EXTENDEDPRICE DOUBLE,
- L_DISCOUNT DOUBLE,
- L_TAX DOUBLE,
- L_RETURNFLAG STRING,
- L_LINESTATUS STRING,
- L_SHIPDATE STRING,
- L_COMMITDATE STRING,
- L_RECEIPTDATE STRING,
- L_SHIPINSTRUCT STRING,
- L_SHIPMODE STRING,
- L_COMMENT STRING)
+(l_orderkey BIGINT,
+ l_partkey BIGINT,
+ l_suppkey BIGINT,
+ l_linenumber INT,
+ l_quantity DOUBLE,
+ l_extendedprice DOUBLE,
+ l_discount DOUBLE,
+ l_tax DOUBLE,
+ l_returnflag STRING,
+ l_linestatus STRING,
+ l_shipdate STRING,
+ l_commitdate STRING,
+ l_receiptdate STRING,
+ l_shipinstruct STRING,
+ l_shipmode STRING,
+ l_comment STRING)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '|' STORED AS ${var:FILE_FORMAT} 
 --STORED AS ${var:FILE_FORMAT} 
 LOCATION '${var:LOCATION}/lineitem';
 
 drop table if exists ${var:KUDU_DB_NAME}.lineitem;
 CREATE TABLE ${var:KUDU_DB_NAME}.lineitem
-PRIMARY KEY (L_ORDERKEY, L_PARTKEY)
-PARTITION BY HASH PARTITIONS 16
+PRIMARY KEY (l_orderkey, l_partkey)
+PARTITION BY HASH PARTITIONS 64
 STORED AS KUDU
+TBLPROPERTIES ('kudu.num_tablet_replicas' = '1')
 AS SELECT * FROM ${var:DB}.lineitem; 
