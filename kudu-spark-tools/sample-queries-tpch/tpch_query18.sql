@@ -14,12 +14,12 @@ group by
 
 create table q18_large_volume_customer_cached as
 select
-	customer._c1,
-	customer._c0,
-	orders._c0,
-	orders._c4,
-	orders._c3,
-	sum(lineitem._c4)
+	customer._c1 as c_name,
+	customer._c0 as c_custkey,
+	orders._c0 as o_orderkey,
+	orders._c4 as o_orderdate,
+	orders._c3 as o_totalprice,
+	sum(l._c4)
 from
 	customer,
 	orders,

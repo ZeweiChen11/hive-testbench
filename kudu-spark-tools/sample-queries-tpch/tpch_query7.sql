@@ -6,8 +6,8 @@ select
 from
 	(
 		select
-			n1.nation._c1 as supp_nation,
-			n2.nation._c1 as cust_nation,
+			n1._c1 as supp_nation,
+			n2._c1 as cust_nation,
 			year(lineitem._c10) as l_year,
 			lineitem._c5 * (1 - lineitem._c6) as volume
 		from
@@ -21,11 +21,11 @@ from
 			supplier._c0 = lineitem._c2
 			and orders._c0 = lineitem._c0
 			and customer._c0 = orders._c1
-			and supplier._c3 = n1.nation._c0
-			and customer._c3 = n2.nation._c0
+			and supplier._c3 = n1._c0
+			and customer._c3 = n2._c0
 			and (
-				(n1.nation._c1 = 'KENYA' and n2.nation._c1 = 'PERU')
-				or (n1.nation._c1 = 'PERU' and n2.nation._c1 = 'KENYA')
+				(n1._c1 = 'KENYA' and n2._c1 = 'PERU')
+				or (n1._c1 = 'PERU' and n2._c1 = 'KENYA')
 			)
 			and lineitem._c10 between '1995-01-01' and '1996-12-31'
 	) as shipping
