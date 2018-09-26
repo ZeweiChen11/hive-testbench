@@ -4,11 +4,11 @@
 drop view if exists l3;
 create view l3 as 
 -- select l_orderkey, count(distinct l_suppkey) as cntSupp
-select l_orderkey, count(distinct l_suppkey)
+select lineitem._c0, count(distinct lineitem._c2)
 from lineitem
-where l_receiptdate > l_commitdate and l_orderkey is not null
-group by l_orderkey
-having count(distinct l_suppkey) = 1
+where lineitem._c12 > lineitem._c11 and lineitem._c0 is not null
+group by lineitem._c0
+having count(distinct lineitem._c2) = 1
 --having cntSupp = 1
 ;
 
