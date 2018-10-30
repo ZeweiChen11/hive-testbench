@@ -48,7 +48,7 @@ function load_table {
 
 for table in nation region supplier
 do
-    ${IMPALA_SHELL} -f tpch-create-table/${t}.sql -d ${KUDU_DB_NAME} --var=KUDU_DB_NAME=${KUDU_DB_NAME}
+    ${IMPALA_SHELL} -f tpch-create-table/${table}.sql -d ${KUDU_DB_NAME} --var=KUDU_DB_NAME=${KUDU_DB_NAME}
     load_table ${table} /user/root/tpch/${SCALE}/${table}/data-m-*
 done
 
