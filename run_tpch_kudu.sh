@@ -47,8 +47,8 @@ function runQuery(){
         echo "run query ${query} in ${stream}..." 2>&1 | tee -a ${LOG_DIR}/tpch_query${query}_${stream}.log
         start=$(date +%s%3N)
         date 2>&1 | tee -a ${LOG_DIR}/tpch_query${query}_${stream}.log
-        ${IMPALA_SHELL} -i ${cor_node} -f sample-queries-tpch/tpch_query${query}.sql -d ${KUDU_DB_NAME} -p --query_option=DEFAULT_SPILLABLE_BUFFER_SIZE=1MB 2>&1 | tee -a ${LOG_DIR}/tpch_query${query}_${stream}.log
-        #${IMPALA_SHELL} -i ${cor_node} -f sample-queries-tpch/tpch_query${query}.sql -d ${KUDU_DB_NAME} -p 2>&1 | tee -a ${LOG_DIR}/tpch_query${query}_${stream}.log
+	${IMPALA_SHELL} -i ${cor_node} -f queries-tpch/q${query}/tpch_query${query}.sql -d ${KUDU_DB_NAME} -p --config_file="queries-tpch/q${query}/q${query}_options.sql" 2>&1 | tee -a ${LOG_DIR}/tpch_query${query}_${stream}.log
+#        ${IMPALA_SHELL} -i ${cor_node} -f sample-queries-tpch/tpch_query${query}.sql -d ${KUDU_DB_NAME} -p --query_option=DEFAULT_SPILLABLE_BUFFER_SIZE=1MB 2>&1 | tee -a ${LOG_DIR}/tpch_query${query}_${stream}.log
         end=$(date +%s%3N)
         getExecTime $start $end >> ${LOG_DIR}/tpch_query${query}_${stream}.log
         date 2>&1 | tee -a ${LOG_DIR}/tpch_query${query}_${stream}.log
