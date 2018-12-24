@@ -6,11 +6,6 @@ cor_node=atlas-cdh96.jf.intel.com
 FILE_FORMAT="TEXTFILE"
 IMPALA_HOME="/root/workspace/impala/"
 IMPALA_SHELL="${IMPALA_HOME}/bin/impala-shell.sh"
-#time=`date +%Y%m%d%H%M%S`
-#LOG_DIR=kudu_log_${time}
-#if [ ! -d ${LOG_DIR} ]; then
-#       mkdir -p ${LOG_DIR}
-#fi
 
 IMPALA_DB_NAME=tpch_impala_${SCALE}
 KUDU_DB_NAME=tpch_kudu_${SCALE}
@@ -23,14 +18,21 @@ function getExecTime() {
 }
 
 function Load(){
-        echo "Dropping caches..."
+	echo "Dropping caches..."
         echo 3 > /proc/sys/vm/drop_caches
         echo "Loading text data into external tables."
         ${IMPALA_SHELL} -i ${cor_node} -q "create database if not exists ${IMPALA_DB_NAME}"
         ${IMPALA_SHELL} -i ${cor_node} -q "create database if not exists ${KUDU_DB_NAME}"
-#       for t in lineitem customer nation orders part partsupp region supplier
-        for t in nation
+        for t in $*
         do
+		#If table is legal
+		if [[ `hadoop fs -ls ${DIR}/${SCALE}/${t} | wc -l` -eq 0 ]]; then
+			echo "No ${t} in ${DIR}/${SCALE}, please check!" 2>&1 | tee -a ${LOG_DIR}/load.log
+			echo "Load - tool for tpch loading table in text into Kudu"
+			echo "Usage:"
+			echo "Load [lineitem] [customer] [nation] [orders] [part] [partsupp] [region] [supplier]"
+			exit 1
+		fi
                 echo 3 > /proc/sys/vm/drop_caches
                 echo "Start loading ${t} ..." 2>&1 | tee -a ${LOG_DIR}/load.log
                 date 2>&1 | tee -a ${LOG_DIR}/load.log
@@ -78,28 +80,6 @@ if [ ! -d ${LOG_DIR} ]; then
 fi
 
 Load
-#====run query in Stream =========
-#time=`date +%Y%m%d%H%M%S`
-#LOG_DIR=kudu_log_${time}_r1
-#mkdir -p ${LOG_DIR}
-#runStream 0 &
-#runStream 1 &
-#runStream 2 &
-#runStream 3 &
-#runStream 4 &
-#
-#wait
-##echo "Dropping caches..."
-##echo 3 > /proc/sys/vm/drop_caches
-#
-#time=`date +%Y%m%d%H%M%S`
-#LOG_DIR=kudu_log_${time}_r2
-#mkdir -p ${LOG_DIR}
-#runStream 0 &
-#runStream 1 &
-#runStream 2 &
-#runStream 3 &
-#runStream 4 &
 
 #====run query in parallel==========
 #stream_query="1 2 3 10"
