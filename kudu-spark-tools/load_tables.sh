@@ -16,14 +16,17 @@ IMPALA_SHELL="/home/bduser/impala/bin/impala-shell.sh"
 KUDU_HOME=/home/bduser/kudu/
 #SPARK_SUBMIT=/root/zewei/spark/bin/spark-submit
 SPARK_SUBMIT=spark-submit
+IMPALA_VERSION=cdh #or "apache"
 
 time=`date +%Y%m%d%H%M%S`
 LOG_DIR=kudu_log_${time}
 if [ ! -d ${LOG_DIR} ]; then
-       mkdir -p ${LOG_DIR}
+	mkdir -p ${LOG_DIR}
 fi
 
-source /home/bduser/impala/bin/impala-config.sh
+if [ "${IMPALA_VERSION}" = "apache" ]; then
+	source ${IMPALA_HOME}/bin/impala-config.sh
+fi
 
 IMPALA_DB_NAME=tpch_impala_${SCALE}
 KUDU_DB_NAME=tpch_kudu_${SCALE}
