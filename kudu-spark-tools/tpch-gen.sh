@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 function usage {
 	echo "Usage: tpch-setup.sh scale_factor [temp_directory]"
 	exit 1
@@ -14,7 +13,7 @@ function runcommand {
 }
 
 if [ ! -f tpch-gen/target/tpch-gen-1.0-SNAPSHOT.jar ]; then
-	echo "Please build the data generator with ./tpch-build.sh first"
+	echo "Please build the data generator with (cd tpch-gen; make) first"
 	exit 1
 fi
 
@@ -24,7 +23,27 @@ TABLES="part lineitem supplier customer orders partsupp nation region"
 # Get the parameters.
 SCALE=$1
 DIR=$2
-BUCKETS=13
+
+#[TODO]Optimize in spark
+#PARALLEL_O : option parallel for lineitem and orders
+#PARALLEL_P : parts partsupp
+#PARALLEL_C : customer
+#PARALLEL_L : nation region suppliers
+if [ $SCALE -le 10 ]; then
+	PARALLEL_O=2
+	PARALLEL_P=2
+	PARALLEL_C=2
+	PARALLEL_L=2
+else 
+	PARALLEL_O=`echo "scale=1; $SCALE / 10" | bc`
+	PARALLEL_O=`echo $PARALLEL_O|awk '{print int($PARALLEL_O)==$PARALLEL_O?$PARALLEL_O:int(int($PARALLEL_O*10/10+1))}'`
+	PARALLEL_O=`echo "scale=0; $PARALLEL_O /1" | bc`
+	PARALLEL_P=`echo "scale=0; $PARALLEL_O / 10" | bc`
+	PARALLEL_P=`echo $PARALLEL_P|awk '{print $PARALLEL_P<2?2:$PARALLEL_P}'`
+	PARALLEL_L=$SCALE
+	PARALLEL_C=$PARALLEL_P
+fi
+
 if [ "X$DEBUG_SCRIPT" != "X" ]; then
 	set -x
 fi
@@ -42,7 +61,6 @@ if [ $SCALE -eq 1 ]; then
 fi
 
 hdfs dfs -mkdir -p ${DIR}
-echo "phase starts from $PHASE."
 echo "Generating data at scale factor $SCALE."
 hadoop fs -rm -r -skipTrash ${DIR}/${SCALE}/
-(cd tpch-gen; hadoop jar target/*.jar -d ${DIR}/${SCALE}/ -s ${SCALE} -text)
+(cd tpch-gen; hadoop jar target/*.jar -d ${DIR}/${SCALE}/o -s ${SCALE} -p ${PARALLEL_O} -t orders -text; hadoop jar target/*.jar -d ${DIR}/${SCALE}/l -s ${SCALE} -p ${PARALLEL_L} -t nation -text; hadoop jar target/*.jar -d ${DIR}/${SCALE}/c -s ${SCALE} -p ${PARALLEL_C} -t customers -text; hadoop jar target/*.jar -d ${DIR}/${SCALE}/p -s ${SCALE} -p ${PARALLEL_P} -t parts -text;)
